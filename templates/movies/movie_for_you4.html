@@ -4,56 +4,85 @@
 <div class="top">
     <div class="columns">
         <div class="column is-full featured_wrapper">
-            <img src="https://user-images.githubusercontent.com/89068148/170289378-64b42624-f3c8-4ac6-b472-d56049d50316.png" class="featured" style="height:800px">
+            <br><br><br><br>
+            <img src="https://user-images.githubusercontent.com/89068148/170512058-8c1d943a-f543-413b-80ea-9fc35b9370af.png" class="featured" style="height:800px">
             <div class="title_wrapper">
-                <h1 class="title has-text-white bouncing text-warning" style="font-size:70px">아직도 흥미가 없나 보군요 ?</h1><br><br><br><br><br><br><br><br>
+                <h1 class="title has-text-white bouncing text-warning" style="font-size:70px">좋아.. 내가 널 만족 시켜 주지...</h1><br><br><br><br><br><br><br><br>
                 <div class="container">
                     <div class="item">
-                        <a href="{% url 'movies:movie_detail' pick_movie.pk %}" class="link-secondary text-white text-decoration-none fs-1 fw-bold">죄송합니다 ! 안녕히 계세요 ! <i class="fa-solid fa-person-running"></i></a>
-                    </div>
-                    <br>
+                        <a href="#selections" class="link-secondary text-white text-decoration-none fs-1 fw-bold">저도 좋아요... [더 진행하기] <i class="fa-solid fa-heart"></i></a>
+                    <br><br>
                     <div class="item">
-                        <a href="#selections" class="item link-secondary text-white text-decoration-none fs-4 fw-bold">조..조금만 더... [더 진행하기]</a>
+                        <a href="#selections" class="item link-secondary text-white text-decoration-none fs-4 fw-bold"> 앗..좋습니다... [더 진행하기]</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <a name="selections">
+</div>
+<br>
+<br>
+<a name="selections">
+<br>
+<br>
+<br>
+
+<div class="column is-full featured_wrapper">
+    <img src="https://user-images.githubusercontent.com/89068148/170512058-8c1d943a-f543-413b-80ea-9fc35b9370af.png" class="featured" style="height:800px">
+    <div class="title_wrapper">
+        <h1 class="title has-text-white bouncing text-warning" style="font-size:70px">간절히 찾고있는 그 영화에 대해 말해 봐...</h1><br><br><br><br><br><br><br><br>
+        <div class="container">
+            <div class="item">
+                    <a href="#" class="link-secondary text-white text-decoration-none fs-1 fw-bold" data-bs-toggle="modal" data-bs-target="#staticBackdrop">제가 찾고 있는 영화는... <i class="fa-solid fa-magnifying-glass"></i></a>                
+                <!-- Modal -->
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg"  style="color:black">
+                    <div class="modal-content">
+                        
+                        <div class="modal-body" style="text-align:center">
+                            <br>
+                            <a href="{% url 'movies:for_you5' %}">
+                                <i id="title" class="fa-solid fa-microphone fs-1" style="font-size:70px"></i>
+                            </a>
+                            <br>
+                            <br>
+                        <h6>클릭시, 브라우저의 마이크 권한을 허용합니다.</h4>
+                        </div>
+
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            
+        </div>
+    </div>
 </div>
 
-<div class="container-fluid">
-	<div class="row  p-0 pt-6 last">
-        {% for item in recommend_movies_by_overview %}
-            <div id="card_container">
-                <div id="card">
-                  <div class="shine"></div>
-                  <div class="text-block">
-                      <h1>{{ item.movie.title }}<br> <small>{{ item.movie.genres }}</small></h1><br><br>
-                      <h3 class="text-danger">same Keywords : {{ item.keywords|length }}</h3>
-                      <h5 class="mt-2">{% for word in item.keywords %}
-                          {{ word }}
-                          {% endfor %}
-                      </h5>
-                      <br>
-                      <br>
-                      <button >
-                          <a href="{% url 'movies:movie_detail' item.movie.pk %}" style="text-decoration:none; color:white;">
-                              GET IT !!
-                          </a>
-                      </button>
-                  </div>
-                  </div>
 
-                </div>
-                {% endfor %} 
-                <a href="{% url 'movies:for_you4' pick_movie.pk %}" class="item link-secondary text-white text-decoration-none fs-3 fw-bold" style="margin-left:20px;">이걸론 만족할 수 없어요 !</a>
-
-
+<script>
+    const title = document.querySelector("#title");
+    const CLICKED_CLASS = "clicked";
+    function handleClick() {
+        const hasClass = title.classList.contains(CLICKED_CLASS);
+        if (!hasClass) {
+            title.classList.add(CLICKED_CLASS);
+        } else {
+            title.classList.remove(CLICKED_CLASS);
+        }
+    }
+    
+    title.addEventListener("click", handleClick);
+    
+    function init() {
+        handleClick();
+    }
+    
+    init();
+</script>
 
 
 <style>
-    
     @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;800&display=swap");
     @import url('https://fonts.googleapis.com/css2?family=Black+And+White+Picture&display=swap');
 
@@ -61,7 +90,11 @@
     @import url(https://fonts.googleapis.com/css?family=Lato:400,300,700);
     @import url(https://fonts.googleapis.com/css?family=Rubik:400,900);
 
-
+i {
+    color : red;
+    transition: color .5s ease-in-out;
+    cursor: pointer;
+}
 
 #card_container {
   width:750px;
@@ -71,19 +104,8 @@
   margin-bottom:150px;
 
 }
-#card {
-  animation:backAn 50s infinite;
-  color:#fff;
-  padding:30px;
-  width:100%;
-  height:100%;
-  position:absolute;
-  z-index:1;
-  background:url(https://user-images.githubusercontent.com/89068148/170313850-ca231139-1a3f-460d-a36a-a1ab260a02d6.png) 100% bottom;
-  /*background:url(http://riccardotartaglia.it/img/deadpool/back.jpg) 100% bottom;*/
-  /*box-shadow:0px 45px 100px rgba(0, 0, 0, 0.4), inset 0 0 0 1000px rgba(156, 27, 27, 0.6);*/
-  box-shadow:0px 45px 100px rgba(0, 0, 0, 0.4), inset 0 0 0 1000px rgba(0, 76, 86, 0.6);
-}
+
+
 #card .text-block {
   position:relative;
   z-index:2;
@@ -164,8 +186,8 @@ button {
         color: #255;
         font-size: 160px;
         margin-top: 110px;
-        -webkit-animation: bounce 0.5s -0.2s infinite;
-                animation: bounce 0.5s -0.2s infinite;
+        -webkit-animation: bounce 0.4s -0.3s infinite;
+                animation: bounce 0.4s -0.3s infinite;
     }
 
     @-webkit-keyframes bounce {

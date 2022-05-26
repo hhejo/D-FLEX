@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.template import VariableDoesNotExist
 from django.views.decorators.http import require_safe
 
 from movies.models import Movie

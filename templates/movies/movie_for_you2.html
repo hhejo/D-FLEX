@@ -6,14 +6,14 @@
         <div class="column is-full featured_wrapper">
             <img src="https://user-images.githubusercontent.com/89068148/170288589-ad2b172a-6d0a-4282-ab29-3c4cc45ae657.png" class="featured" style="height:800px">
             <div class="title_wrapper">
-                <h1 class="title has-text-white bouncing" style="color:#0431B4; font-size:70px">원하는 걸 못 찾았나요 ?</h1><br><br><br><br><br><br><br><br>
+                <h1 class="title has-text-white bouncing text-warning" style="font-size:70px">원하는 걸 못 찾았나요 ?</h1><br><br><br><br><br><br><br><br>
                 <div class="container">
                     <div class="item">
-                        <a href="{% url 'movies:movie_detail' pick_movie.pk %}" class="link-secondary text-danger text-decoration-none fs-1 fw-bold">차..찾은 것 같아요 ! <i class="fa-solid fa-person-running"></i></a>
+                        <a href="{% url 'movies:movie_detail' pick_movie.pk %}" class="link-secondary text-white text-decoration-none fs-1 fw-bold">차..찾은 것 같아요 ! <i class="fa-solid fa-person-running"></i></a>
                     </div>
                     <br>
                     <div class="item">
-                        <a href="#actors_page" class="item link-secondary text-danger text-decoration-none fs-4 fw-bold">글쎄요... ? [더 진행하기]</a>
+                        <a href="#actors_page" class="item link-secondary text-white text-decoration-none fs-4 fw-bold">글쎄요... ? [더 진행하기]</a>
                     </div>
                 </div>
             </div>
@@ -26,7 +26,7 @@
 <div class="container">
 	<div class="columns is-multiline p-0 pt-6 last">
 		<div class="column is-full">
-			<h1 class="has-text-white bouncing" style="color:#0431B4; font-size:60px">이런 장르는 어때요 ? ( {{recommend_movies_by_genres|length}} )</h1>
+			<h1 class="has-text-white bouncing text-warning" style="font-size:60px">이런 장르는 어때요 ? ( {{recommend_movies_by_genres|length}} )</h1>
 		</div>
         <div class="container-fluid px-4" style="margin:20px;">
             <div class="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
@@ -50,7 +50,7 @@
                 {% endfor %}
             </div>
         </div>
-        <a href="{% url 'movies:for_you3' pick_movie.pk %}" class="item link-secondary text-danger text-decoration-none fs-3 fw-bold">ㅁ..뭐...더 없나요 ?</a>
+        <a href="{% url 'movies:for_you3' pick_movie.pk %}" class="item link-secondary text-white text-decoration-none fs-3 fw-bold">ㅁ..뭐...더 없나요 ?</a>
 
 
 

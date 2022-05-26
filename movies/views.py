@@ -269,10 +269,13 @@ def for_you3(request, movie_pk):
     return render(request, 'movies/movie_for_you3.html', context)
 
 
+
 def for_you4(request, movie_pk):
     pick_movie = get_object_or_404(Movie, pk=movie_pk)
+    return render(request, 'movies/movie_for_you4.html')
 
 
+def for_you5(request):
     # 사운드 파일 추출 할거임 근데 토글을 마이크 버튼 필요할듯???
     import requests, json
     import queue, os, threading
@@ -296,21 +299,21 @@ def for_you4(request, movie_pk):
                 q.put(indata.copy())
                 
     def start():
-                global recorder
-                global recording
+                nonlocal recorder
+                nonlocal recording
                 recording = True
                 recorder = threading.Thread(target=complicated_record)
                 print('start recording')
                 recorder.start()
                 
     def stop():
-                global recorder
-                global recording
+                nonlocal recorder
+                nonlocal recording
                 recording = False
                 recorder.join()
                 print('stop recording')
             
-
+    time.sleep(1)
     start()
     time.sleep(5)
     stop()
@@ -323,15 +326,41 @@ def for_you4(request, movie_pk):
             'X-DSS-Service': 'DICTATION',
             'Authorization': f'KakaoAK {voice_key}',
         }
-    data = open("sounds/temp.wav", "rb").read() # wav 파일을 바이너리 형태로 변수에 저장한다.
+    data = open("sounds/temp.wav", "rb").read()
     response = requests.post('https://kakaoi-newtone-openapi.kakao.com/v1/recognize', headers=headers, data=data)
 
-    print(response.text)
+    answer = response.text
+    idx = answer.find('finalResult')
+    answer = answer[idx+22:idx+70]
+    back_idx = answer.find(',"nBest"')
+    answer = answer[:back_idx-1]
 
+    # 검색 영상 리스트 by youtube api
+    from googleapiclient.discovery import build
+    DEVELOPER_KEY = "AIzaSyC1CzkerAIdAl_9mBAjF9m1uPBzOmCvhbs"
+    YOUTUBE_API_SERVICE_NAME="youtube"
+    YOUTUBE_API_VERSION="v3"
+    youtube = build(YOUTUBE_API_SERVICE_NAME,YOUTUBE_API_VERSION,developerKey=DEVELOPER_KEY)
+
+    search_response_data = youtube.search().list(
+    q = answer,
+    order = "relevance",
+    fields = "items(id)",
+    part = "snippet",
+    maxResults = 4
+    ).execute()['items']
+
+    video_list = []
+    for item in search_response_data:
+        video = f"https://www.youtube.com/embed/{item['id']['videoId']}?rel=0&controls=0&showinfo=0"
+        video_list.append({'video': video})
 
 
     context = {
-        'pick_movie' : pick_movie,
+        'voice' : answer,
+        'video_list' :video_list,
+        'answer' : answer,
+
     }
 
-    return render(request, 'movies/movie_for_you4.html', context)
+    return render(request, 'movies/movie_for_you5.html', context)
