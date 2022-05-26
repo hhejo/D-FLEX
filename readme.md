@@ -7,3 +7,4 @@
    python manage.py loaddata new_data2.json
 ```
 
+# 위의 내용을 새로 진행해야 합니다. api 추가

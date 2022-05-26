@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<br><br><br><br>
 <div class="container">
   <h2 class="my-3 border-bottom pb-2 text-secondary fw-bold">Login</h2>
   <form action="{% url 'accounts:login' %}" method="post" class="post-form my-3">
@@ -21,5 +22,8 @@
     <button type="submit" class="btn btn-danger fw-bold">Login</button>
     <a href="{% url 'articles:articles' %}" class="btn btn-secondary ms-auto fw-bold" style="width: 68.25px;">Back</a>
   </form>
+  <a href="{% url 'accounts:kakao_login' %}">
+    <img src="https://user-images.githubusercontent.com/89068148/170420840-ee7595d5-f64a-4cfb-9050-b945c4015f3e.png" alt="">
+  </a>
 </div>
 {% endblock %}

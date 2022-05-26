@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-black" style="height: 7vh;">
+<nav class="navbar fixed-top navbar-expand-md navbar-dark bg-black">
   <div class="container-fluid">
     
-    <a href="{% url 'home:home' %}" class="navbar-brand nav-link text-danger fw-bold fs-4 me-5" style="font-family: 'Anton', sans-serif;">D-FLEX</a>
+    <a href="{% url 'home:home' %}" class="navbar-brand nav-link text-danger fw-bold fs-4 me-5" style="font-family: 'Anton', sans-serif;">D - FLEX</a>
 
 
     <div class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -30,30 +30,17 @@
           <!-- Logout -->
           <li class="nav-item">
             <!-- Button trigger modal -->
-            <button type="submit" class="bg-dark-secondary nav-link" style="border: 2px;" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <button type="submit" class="btn btn-dark nav-link" style="border: 2px;" data-bs-toggle="modal" data-bs-target="#exampleModal">
               Logout
             </button>
+            <style>
+              .btn-dark {
+                --bs-btn-bg: none;
+                --bs-btn-hover-bg: none;
+              }
+            </style>
             <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content bg-dark">
-                  <div class="modal-header" style="border: none;">
-                    <h5 class="modal-title text-light" id="exampleModalLabel">Logout</h5>
-                    <button type="button" class="btn-close bg-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body text-light">
-                    Are you sure you want to log out?
-                  </div>
-                  <div class="modal-footer" style="border: none;">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <form action="{% url 'accounts:logout' %}" method="post">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger">Logout</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
+
             {% comment %} <form action="{% url 'accounts:logout' %}" method="post">
               {% csrf_token %}
               <button type="submit" class="bg-dark-secondary nav-link" style="border: none;">Logout</button>

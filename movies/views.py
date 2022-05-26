@@ -1,22 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_safe, require_http_methods, require_POST
+from django.contrib.auth.decorators import login_required
 
 from django.core.paginator import Paginator
 
 from movies.forms import ReviewForm
 from .models import Movie, Review
 
+actors_img = []
+
 
 # path('', views.movies),
 @require_safe
 def movies(request):
-    # movies = Movie.objects.all().order_by('-release_date')
-    # context = {
-    #     'movies': movies
-    # }
-    # return render(request, 'movies/movies.html', context)
-
     page = request.GET.get('page', '1')
     movies = Movie.objects.order_by('-release_date')
     MOVIES_PER_PAGE = 40
@@ -31,8 +28,9 @@ def movies(request):
 # path('<int:movie_pk>/', views.movie_detail),
 @require_safe
 def movie_detail(request, movie_pk):
+    global actors_img
     movie = get_object_or_404(Movie, pk=movie_pk)
-    genres = movie.genres.strip('[]').replace("'",'').split(',')[:3]
+    genres = movie.genres.strip('[]').replace("'",'').split(',')[:4]
     movie.overview = movie.overview
     form = ReviewForm()
 
@@ -44,33 +42,30 @@ def movie_detail(request, movie_pk):
     # youtube = build(YOUTUBE_API_SERVICE_NAME,YOUTUBE_API_VERSION,developerKey=DEVELOPER_KEY)
 
     # search_response_data = youtube.search().list(
-    # q = movie.title + ' 영화',
+    # q = movie.title + '영화',
     # order = "relevance",
+    # fields = "items(id)",
     # part = "snippet",
-    # maxResults = 10
+    # maxResults = 6
     # ).execute()['items']
 
     # video_list = []
     # for item in search_response_data:
     #     video = f"https://www.youtube.com/embed/{item['id']['videoId']}?rel=0&controls=0&showinfo=0"
-    #     title = item['snippet']['title']
-    #     date = item['snippet']['publishedAt']
-    #     video_list.append({'video':video, 'title':title, 'date':date})
+    #     video_list.append({'video':video})
 
-    import os
-    import sys
+
     import urllib.request
     import json
     client_id = "MB8drhevCnawoQjOxc5S"
     client_secret = "D9wdXNLZar"
 
-    encText = urllib.parse.quote(movie.title)
+    encText = urllib.parse.quote(movie.title+'명장면')
     url = "https://openapi.naver.com/v1/search/image?query=" + encText
     request1 = urllib.request.Request(url)
     request1.add_header("X-Naver-Client-Id",client_id)
     request1.add_header("X-Naver-Client-Secret",client_secret)
     response = urllib.request.urlopen(request1)
-    rescode = response.getcode()
 
     response_body = response.read()
     str_data = response_body.decode('utf-8')
@@ -78,27 +73,15 @@ def movie_detail(request, movie_pk):
     
     img_movies = []
     for item in json_data['items']:
-        img_movies.append({ 'img': item['thumbnail'] })
+        if item['thumbnail']:
+            img_movies.append({ 'img': item['thumbnail'] })
    
-    # 감독 정보 이미지 크롤링
-    encText = urllib.parse.quote(movie.director+' 감독')
-    url = "https://openapi.naver.com/v1/search/image?query=" + encText
-    request1 = urllib.request.Request(url)
-    request1.add_header("X-Naver-Client-Id",client_id)
-    request1.add_header("X-Naver-Client-Secret",client_secret)
-    response = urllib.request.urlopen(request1)
-    
-    response_body = response.read()
-    answer = response_body.decode('utf-8')
-    answer = json.loads(answer)
-    img_director = answer['items'][0]['thumbnail'] if answer['items'] else []
-
 
     # 배우정보 크롤링
     img_actors = []
     for actor in movie.actors.strip('[]').split(','):
         actor = actor.strip("''")
-        encText = urllib.parse.quote(actor)
+        encText = urllib.parse.quote(actor+'얼굴')
         url = "https://openapi.naver.com/v1/search/image?query=" + encText
         request1 = urllib.request.Request(url)
         request1.add_header("X-Naver-Client-Id",client_id)
@@ -108,22 +91,23 @@ def movie_detail(request, movie_pk):
         response_body = response.read()
         answer = response_body.decode('utf-8')
         answer = json.loads(answer)
+        if not answer['items']:
+            continue
         answer = answer["items"][0]['thumbnail'] if answer['items'] else []
         
         img_actors.append({
             'name':actor,
             'img':answer,
         })
+    
+    actors_img = img_actors[:]
 
     context = {
         'movie': movie,
         'review_form': form,
         'genres':genres,
-        'search_response_data':[],
         # 'video_list':video_list,
-        'img_movies_first':img_movies[0],
-        'img_movies':img_movies[1:],
-        'img_director':img_director,
+        'img_movies':img_movies,
         'img_actors':img_actors,
     }
     return render(request, 'movies/movie_detail.html', context)
@@ -146,8 +130,37 @@ def review_create(request, movie_pk):
 
 # path('<int:movie_pk>/review/<int:review_pk>/update/', views.review_update),
 # @login_required
+# def review_update(request, movie_pk, review_pk):
+#     pass
+
+
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
 def review_update(request, movie_pk, review_pk):
-    pass
+    movie = get_object_or_404(Movie, pk=movie_pk)
+    review = get_object_or_404(Review, pk=review_pk)
+    if request.user != review.user:
+        return redirect('movies:movie_detail', movie_pk)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            return redirect('movies:movie_detail', movie_pk)
+    else:
+        form = ReviewForm(instance=review)
+    context = {
+        'movie': movie,
+        'review': review,
+        'reivew_form': form,
+    }
+    return render(request, 'movies/review_update.html', context)
+
+
+
+
+
 
 
 # path('<int:movie_pk>/review/<int:review_pk>/delete/', views.review_delete),
@@ -160,68 +173,98 @@ def review_delete(request, movie_pk, review_pk):
     return redirect('movies:movie_detail', movie_pk)
 
 
-
 def for_you(request, movie_pk):
+    global actors_img
     pick_movie = get_object_or_404(Movie, pk=movie_pk)
     movies = Movie.objects.all()
     movies = [movie for movie in movies if movie.pk != movie_pk]
-
+    
     # 배우 기반 추천
-    actors = pick_movie.actors
     recommend_movies_by_actors = []
     flag = 0
     for movie in movies:
         if flag:
             flag = 0
             continue
-        for actor in actors.strip('[]').split(','):
+        for item in actors_img:
+            actor = item['name']
             if flag:
                 break
             if actor in movie.actors:
-                recommend_movies_by_actors.append(movie)
+                recommend_movies_by_actors.append({'actor':actor.strip("''"), 'actor_img': [i['img'] for i in actors_img if i['name'] == actor], 'movie':movie})
                 flag = 1
                 break
+
+    context = {
+        'recommend_movies_by_actors' : recommend_movies_by_actors,
+        'pick_movie' : pick_movie,
+    }
+
+    return render(request, 'movies/movie_for_you.html', context)
     
-    
+
+# 장르기반
+def for_you2(request, movie_pk):
+    pick_movie = get_object_or_404(Movie, pk=movie_pk)
+    movies = Movie.objects.all()
+    movies = [movie for movie in movies if movie.pk != movie_pk]
     # 장르 기반 추천
+    flag = 0
     genres = pick_movie.genres
     recommend_movies_by_genres = []
     for movie in movies:
         if flag:
             flag = 0
             continue
+        same_genre = []
         cnt = 0
+
         for genre in genres.strip('[]').split(','):
             if genre in movie.genres:
+                same_genre.append(genre)
                 cnt += 1
                 
-            if cnt >= 2:
-                    recommend_movies_by_genres.append(movie)
+            if cnt >= 3:
+                    recommend_movies_by_genres.append({'movie':movie, 'same_genres':same_genre})
                     flag = 1
                     break
     
+    context = {
+        'recommend_movies_by_genres' : recommend_movies_by_genres,
+        'pick_movie' : pick_movie,
+    }
 
+    return render(request, 'movies/movie_for_you2.html', context)
+
+
+def for_you3(request, movie_pk):
+    pick_movie = get_object_or_404(Movie, pk=movie_pk)
+    movies = Movie.objects.all()
+    movies = [movie for movie in movies if movie.pk != movie_pk]
     # 줄거리 기반 추천
     pick_movie_keywords = pick_movie.overview.replace('.','').replace(',','').split()
     pick_movie_keywords = set([i for i in pick_movie_keywords if i not in {'그', '된다', \
         '되어', '되고', '은', '는', '이', '가', '어느', '있는', '된', '바로', '때', '알게', '통해',\
         '위해', '할', '날', '자신을', '나오는', '무렵', '전부', '수', '자신이', '그가', '마침내',\
         '전', '있음을', '알', '없는', '한', '후', '한', '두', '될', '채', '더', '그의', '그가', '그는',\
-        '모든', '하지만', '최고의' }])
+        '모든', '하지만', '최고의', '하는데', '그리고', '오랜', '못한', '예상치', '새로운', '들어온', '속', '맞서', '하는데…',\
+        '맞서', '넘어', }])
     answer = []
     for movie in movies:
         temp = set(movie.overview.split())
         same_keywords = pick_movie_keywords & temp
-        if len(same_keywords) >= 1:
-            answer.append([movie.title, same_keywords])
+        if len(same_keywords) > 1:
+            answer.append([movie, same_keywords])
     answer.sort(key= lambda x : len(x[1]), reverse=True)
 
+    recommend_movies_by_overview = []
+    for movie, keywords in answer:
+        movie.genres = movie.genres.strip("[]").replace("'", "")
+        recommend_movies_by_overview.append({'movie':movie, 'keywords':keywords})
+
     context = {
-        'recommend_movies_by_actors' : recommend_movies_by_actors,
-        'recommend_movies_by_genres' : recommend_movies_by_genres,
-        'recommend_movie_by_overview_keywords'  : answer[:7]
+        'recommend_movies_by_overview' : recommend_movies_by_overview,
+        'pick_movie' : pick_movie,
     }
 
-    return render(request, 'movies/movie_for_you.html', context)
-    
-    # recommend_movies_by_
+    return render(request, 'movies/movie_for_you3.html', context)
