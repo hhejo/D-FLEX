@@ -247,7 +247,8 @@ def for_you3(request, movie_pk):
         '위해', '할', '날', '자신을', '나오는', '무렵', '전부', '수', '자신이', '그가', '마침내',\
         '전', '있음을', '알', '없는', '한', '후', '한', '두', '될', '채', '더', '그의', '그가', '그는',\
         '모든', '하지만', '최고의', '하는데', '그리고', '오랜', '못한', '예상치', '새로운', '들어온', '속', '맞서', '하는데…',\
-        '맞서', '넘어', '것', '함께', '차츰', '마치고', '사이에는', '그에게' , '서로의', '가능한', '겪으며'}])
+        '맞서', '넘어', '것', '함께', '차츰', '마치고', '사이에는', '그에게' , '서로의', '가능한', '겪으며',\
+        '아직도', '건', '사람은', '사실을', '사람을', '줄', '알았던', '자신의', '목숨을', '위협에' }])
     answer = []
     for movie in movies:
         temp = set(movie.overview.split())
@@ -319,7 +320,7 @@ def for_you5(request):
     stop()
 
     url = "https://kakaoi-newtone-openapi.kakao.com/v1/recognize"
-    voice_key = 'cb99e9641f5d1a1b75618fccfb9a951f'
+    voice_key = '5c9c92fda2c59c3adda019077f792df4'
     headers = {
             'Host': 'kakaoi-newtone-openapi.kakao.com',
             'Content-Type': 'application/octet-stream',
